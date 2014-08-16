@@ -47,7 +47,7 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
       $ts3->message("Pong!");
       break;
   case "!botinfo":
-      $ts3->message('Bot AckBot je $killův home-made bot, který umí pár užitečných příkazů, které TeamSpeak postrádá. Bota naprogramoval $kill v PHP na Frameworku od PlanetTeamspeak. Zdrojový kód bota bude brzy k dispozici.');
+      $ts3->message('Bot AckBot je $killův home-made bot, který umí pár užitečných příkazů, které TeamSpeak postrádá. Bota naprogramoval $kill v PHP na Frameworku od PlanetTeamspeak. Zdrojový kód bota je k dispozici zde https://github.com/sisa1917/ts3-php-bot.');
       break;
   case "!bothelp":
       $ts3->message("
