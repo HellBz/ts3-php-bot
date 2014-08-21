@@ -3,7 +3,7 @@ require_once("libraries/TeamSpeak3/TeamSpeak3.php");
 goto main;
 main:
 // pripojeni na server
-$ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
+$ts3 = TeamSpeak3::factory("serverquery://serveradmin:Traktor1917@93.185.105.165:10011/?server_port=9987&blocking=0");
 $ts3->request("clientupdate client_nickname=AckBot"); //Nastaveni jmena
 // registrace eventu na ts query
 $ts3->notifyRegister("textserver");
@@ -23,7 +23,7 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
     
   $invoker_object = $ts3->clientGetByName($invoker);
   $invoker_db = $invoker_object->infoDb();	// fungovani pouze pro zvolene lidi
-  if($invoker_db["client_unique_identifier"] == "nRDR6yogmp2o5bHO5GfIhCXsFJU=" OR $client_db["client_unique_identifier"] == "xi9k0Xe+16RqyIJ2ApdtvvJgOcY=") { 
+  if($invoker_db["client_unique_identifier"] == "nRDR6yogmp2o5bHO5GfIhCXsFJU=" OR $invoker_db["client_unique_identifier"] == "xi9k0Xe+16RqyIJ2ApdtvvJgOcY=" OR $invoker_db["client_unique_identifier"] == "2qid9kGm+4JdPy/aLaOAisxLbsw=") { 
 
  // priprava promennych a orezani zprav pro ify
   $uid = substr($msg,0, 4);
@@ -47,7 +47,7 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
       $ts3->message("Pong!");
       break;
   case "!botinfo":
-      $ts3->message('Bot AckBot je $killův home-made bot, který umí pár užitečných příkazů, které TeamSpeak postrádá. Bota naprogramoval $kill v PHP na Frameworku od PlanetTeamspeak. Zdrojový kód bota je k dispozici zde https://github.com/sisa1917/ts3-php-bot.');
+      $ts3->message('Bot AckBot je $killův home-made bot, který umí pár užitečných příkazů, které TeamSpeak postrádá. Bota naprogramoval $kill v PHP na Frameworku od PlanetTeamspeak. Zdrojový kód bota je k dispozici zde https://github.com/sisa1917/ts3-php-bot');
       break;
   case "!bothelp":
       $ts3->message("
@@ -55,6 +55,8 @@ Příkazy AckBota:
 !ping - Test bota
 !botinfo - Zobrazí informace o botovi
 !bothelp - Zobrazí informace o dostupných příkazech
+!addrooms - Přidá další místnosti v případě nutnosti
+!removerooms - Smaže přidané místnosti pomocí !addrooms
 !uid - Zobrazí unikátní identifikátor uživatele
 !stick - Přilepí uživatele k místnosti
 !unstick - Odlepí uživatele od místnosti
@@ -62,8 +64,52 @@ Příkazy AckBota:
 !unmute - Odmlčí uživatele
 !chatmute - Zakáže chat uživateli
 !chatunmute - Povolí chat uživateli");
-    break;
-  }     
+      break;
+  case "!addrooms":
+      $ts3->message("Přidávám přídavné místnosti...");
+      global $chann1, $chann2, $chann3;
+      try {
+      $chann1 = $ts3->channelCreate(array (
+  "channel_name"           => "Místnost 3",
+  "channel_topic"          => "",
+  "channel_codec"          => TeamSpeak3::CODEC_OPUS_VOICE,
+  "channel_flag_permanent" => TRUE,
+  "cpid"                   => 2,
+));
+      $chann2 = $ts3->channelCreate(array (
+  "channel_name"           => "Místnost 3",
+  "channel_topic"          => "",
+  "channel_codec"          => TeamSpeak3::CODEC_OPUS_VOICE,
+  "channel_flag_permanent" => TRUE,
+  "cpid"                   => 3,
+));
+      $chann3 = $ts3->channelCreate(array (
+  "channel_name"           => "Místnost 3",
+  "channel_topic"          => "",
+  "channel_codec"          => TeamSpeak3::CODEC_OPUS_VOICE,
+  "channel_flag_permanent" => TRUE,
+  "cpid"                   => 16,
+));}
+      catch(TeamSpeak3_Exception $error) {$chyba = true;}
+      if(!$chyba) {
+      $ts3->message("Přídavné místnosti přidány"); }
+      else $ts3->message("Přídavné místnosti se nepodařilo přidat");
+      break;
+  case "!removerooms":
+      $ts3->message("Mažu přídavné místnosti...");
+      global $chann1, $chann2, $chann3;
+      echo $chann1;
+      try{
+      $ts3->channelDelete($chann1);
+      $ts3->channelDelete($chann2);
+      $ts3->channelDelete($chann3);}
+      catch(TeamSpeak3_Exception $error) {$chyba = true;}
+      if(!$chyba) {
+      $ts3->message("Přídavné místnosti byly smazány"); }
+      else $ts3->message("Přídavné místnosti se nepodařilo smazat");
+      break;
+      
+  }
     
     //v ifech jsou slozitejsi prikazy s volbami (!stick jmeno)
   if($uid == "!uid") {
@@ -86,7 +132,7 @@ Příkazy AckBota:
       $ts3->message("Uživatel ".$stick_user." byl prilepen"); }
       else $ts3->message("Uživatel ".$stick_user." nebyl nalezen");
       }
-      else $ts3->message("Spravne pouziti: !stick <jmeno>");
+      else $ts3->message("Správné použití: !stick <jméno>");
   }
   if($unstick == "!unstick") {
       if($unstick_user != "") {
@@ -147,5 +193,5 @@ Příkazy AckBota:
 }
 }
 }
-if($chyba_spojeni) $chyba_spojeni = false; echo "spojeni preruseno, zkousim znovu \r"; goto main;
+if($chyba_spojeni) $chyba_spojeni = false; echo "spojeni preruseno, zkousim znovu /n"; goto main;
 ?>
