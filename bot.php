@@ -3,7 +3,7 @@ require_once("libraries/TeamSpeak3/TeamSpeak3.php");
 goto main;
 main:
 // pripojeni na server
-$ts3 = TeamSpeak3::factory("serverquery://serveradmin:Traktor1917@93.185.105.165:10011/?server_port=9987&blocking=0");
+$ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
 $ts3->request("clientupdate client_nickname=AckBot"); //Nastaveni jmena
 // registrace eventu na ts query
 $ts3->notifyRegister("textserver");
