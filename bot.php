@@ -3,7 +3,7 @@ require_once("libraries/TeamSpeak3/TeamSpeak3.php");
 goto main;
 main:
 // pripojeni na server
-$ts3 = TeamSpeak3::factory("serverquery://serveradmin:Traktor1917@93.185.105.165:10011/?server_port=9987&blocking=0");
+$ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
 $ts3->request("clientupdate client_nickname=AckBot"); //Nastaveni jmena
 // registrace eventu na ts query
 $ts3->notifyRegister("textserver");
@@ -23,7 +23,7 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
     
   $invoker_object = $ts3->clientGetByName($invoker);
   $invoker_db = $invoker_object->infoDb();	// fungovani pouze pro zvolene lidi
-  if($invoker_db["client_unique_identifier"] == "nRDR6yogmp2o5bHO5GfIhCXsFJU=" OR $invoker_db["client_unique_identifier"] == "xi9k0Xe+16RqyIJ2ApdtvvJgOcY=" OR $invoker_db["client_unique_identifier"] == "2qid9kGm+4JdPy/aLaOAisxLbsw=") { 
+  if($invoker_db["client_unique_identifier"] == "UDe92xeUw1ukT46FylXjz6LbpUY=" OR $invoker_db["client_unique_identifier"] == "xi9k0Xe+16RqyIJ2ApdtvvJgOcY=" OR $invoker_db["client_unique_identifier"] == "2qid9kGm+4JdPy/aLaOAisxLbsw=" OR $invoker_db["client_unique_identifier"] == "2tb9A107zjNvsMgahMGAEhVvglA=" OR $invoker_db["client_unique_identifier"] == "M19tKb6kTJguzYyn6pxkBrcREzc=") { 
 
  // priprava promennych a orezani zprav pro ify
   $uid = substr($msg,0, 4);
@@ -66,7 +66,7 @@ Příkazy AckBota:
 !chatunmute - Povolí chat uživateli");
       break;
   case "!addrooms":
-      $ts3->message("Přidávám přídavné místnosti...");
+      $ts3->message("Přidávám dodatečné místnosti...");
       global $chann1, $chann2, $chann3;
       try {
       $chann1 = $ts3->channelCreate(array (
@@ -92,11 +92,11 @@ Příkazy AckBota:
 ));}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-      $ts3->message("Přídavné místnosti přidány"); }
-      else $ts3->message("Přídavné místnosti se nepodařilo přidat");
+      $ts3->message("Dodatečné místnosti přidány"); }
+      else $ts3->message("Dodatečné místnosti se nepodařilo přidat");
       break;
   case "!removerooms":
-      $ts3->message("Mažu přídavné místnosti...");
+      $ts3->message("Mažu dodatečné místnosti...");
       global $chann1, $chann2, $chann3;
       echo $chann1;
       try{
@@ -105,8 +105,8 @@ Příkazy AckBota:
       $ts3->channelDelete($chann3);}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-      $ts3->message("Přídavné místnosti byly smazány"); }
-      else $ts3->message("Přídavné místnosti se nepodařilo smazat");
+      $ts3->message("Dodatečné místnosti byly smazány"); }
+      else $ts3->message("Dodatečné místnosti se nepodařilo smazat");
       break;
       
   }
@@ -180,7 +180,7 @@ Příkazy AckBota:
   }
   if($unmutechat == "!chatunmute") {
       if($unmutechat_user != "") {
-      $ts3->message("Zakazuji chat uživateli ".$unmutechat_user."...");
+      $ts3->message("Povoluji chat uživateli ".$unmutechat_user."...");
       try {$ts3->clientGetByName($unmutechat_user)->permRemove("b_client_server_textmessage_send");$ts3->clientGetByName($unmutechat_user)->permRemove("b_client_channel_textmessage_send");}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
@@ -193,5 +193,5 @@ Příkazy AckBota:
 }
 }
 }
-if($chyba_spojeni) $chyba_spojeni = false; echo "spojeni preruseno, zkousim znovu /n"; goto main;
+if($chyba_spojeni) $chyba_spojeni = false; echo "spojeni preruseno, zkousim znovu   "; goto main;
 ?>
