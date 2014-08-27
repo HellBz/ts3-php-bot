@@ -3,8 +3,10 @@ require_once("libraries/TeamSpeak3/TeamSpeak3.php");
 goto main;
 main:
 // pripojeni na server
-$ts3 = TeamSpeak3::factory('serverquery://serveradmin:Traktor1917@93.185.105.165:10011/?server_port=9987&blocking=0');
-$ts3->request('clientupdate client_nickname=$killBot'); //Nastaveni jmena
+
+$ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
+$ts3->request("clientupdate client_nickname=AckBot"); //Nastaveni jmena
+
 // registrace eventu na ts query
 $ts3->notifyRegister("textserver");
 // registrace callbacku
@@ -193,5 +195,10 @@ Příkazy $killBota:
 }
 }
 }
+<<<<<<< HEAD
 if($chyba_spojeni) $chyba_spojeni = false; echo "spojeni preruseno, zkousim znovu   "; goto main;
 ?>
+=======
+if($chyba_spojeni) $chyba_spojeni = false; echo "spojeni preruseno, zkousim znovu /n"; goto main;
+?>
+>>>>>>> 6d0c1bc16dbe62d8e78df11c252284a823288561
