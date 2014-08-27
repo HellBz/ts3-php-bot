@@ -3,8 +3,8 @@ require_once("libraries/TeamSpeak3/TeamSpeak3.php");
 goto main;
 main:
 // pripojeni na server
-$ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
-$ts3->request("clientupdate client_nickname=AckBot"); //Nastaveni jmena
+$ts3 = TeamSpeak3::factory('serverquery://serveradmin:Traktor1917@93.185.105.165:10011/?server_port=9987&blocking=0');
+$ts3->request('clientupdate client_nickname=$killBot'); //Nastaveni jmena
 // registrace eventu na ts query
 $ts3->notifyRegister("textserver");
 // registrace callbacku
@@ -19,7 +19,7 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
   $msg = $event["msg"];
   $invoker = $event["invokername"];
     
-  if($invoker != "AckBot") { // ochrana proti problemum s volanim sam sebe
+  if($invoker != '$killBot') { // ochrana proti problemum s volanim sam sebe
     
   $invoker_object = $ts3->clientGetByName($invoker);
   $invoker_db = $invoker_object->infoDb();	// fungovani pouze pro zvolene lidi
@@ -47,11 +47,11 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
       $ts3->message("Pong!");
       break;
   case "!botinfo":
-      $ts3->message('Bot AckBot je $killův home-made bot, který umí pár užitečných příkazů, které TeamSpeak postrádá. Bota naprogramoval $kill v PHP na Frameworku od PlanetTeamspeak. Zdrojový kód bota je k dispozici zde https://github.com/sisa1917/ts3-php-bot');
+      $ts3->message('$killBot je $killův home-made bot, který umí pár užitečných příkazů, které TeamSpeak postrádá. Bota naprogramoval $kill v PHP na Frameworku od PlanetTeamspeak. Zdrojový kód bota je k dispozici zde https://github.com/sisa1917/ts3-php-bot');
       break;
   case "!bothelp":
-      $ts3->message("
-Příkazy AckBota:
+      $ts3->message('
+Příkazy $killBota:
 !ping - Test bota
 !botinfo - Zobrazí informace o botovi
 !bothelp - Zobrazí informace o dostupných příkazech
@@ -63,7 +63,7 @@ Příkazy AckBota:
 !mute - Umlčí uživatele
 !unmute - Odmlčí uživatele
 !chatmute - Zakáže chat uživateli
-!chatunmute - Povolí chat uživateli");
+!chatunmute - Povolí chat uživateli');
       break;
   case "!addrooms":
       $ts3->message("Přidávám dodatečné místnosti...");
@@ -129,7 +129,7 @@ Příkazy AckBota:
       try {$ts3->clientGetByName($stick_user)->permAssign("b_client_is_sticky", TRUE);}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-      $ts3->message("Uživatel ".$stick_user." byl prilepen"); }
+      $ts3->message("Uživatel ".$stick_user." byl přilepen"); }
       else $ts3->message("Uživatel ".$stick_user." nebyl nalezen");
       }
       else $ts3->message("Správné použití: !stick <jméno>");
