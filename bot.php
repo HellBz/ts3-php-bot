@@ -3,7 +3,7 @@ require_once("libraries/TeamSpeak3/TeamSpeak3.php");
 goto main;
 main:
 // pripojeni na server
-$ts3 = TeamSpeak3::factory("serverquery://serveradmin:Traktor1917@93.185.105.165:10011/?server_port=9987&blocking=0");
+$ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
 $ts3->request('clientupdate client_nickname=$killBot'); //Nastaveni jmena
 if(!$chyba_spojeni) $ts3->message("Verze 1.6.2 nyní běží...");
 
