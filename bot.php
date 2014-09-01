@@ -2,10 +2,12 @@
 require_once("libraries/TeamSpeak3/TeamSpeak3.php");
 goto main;
 main:
-
 // pripojeni na server
-$ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
+$ts3 = TeamSpeak3::factory("serverquery://serveradmin:Traktor1917@93.185.105.165:10011/?server_port=9987&blocking=0");
 $ts3->request('clientupdate client_nickname=$killBot'); //Nastaveni jmena
+if(!$chyba_spojeni) $ts3->message("Verze 1.6.2 nyní běží...");
+
+$chyba_spojeni = false;
 
 // registrace eventu na ts query
 $ts3->notifyRegister("textserver");
@@ -28,7 +30,8 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
     
   $invoker_object = $ts3->clientGetByName($invoker);
   $invoker_db = $invoker_object->infoDb();	// fungovani pouze pro zvolene lidi
-  if($invoker_db["client_unique_identifier"] == "UDe92xeUw1ukT46FylXjz6LbpUY=" OR $invoker_db["client_unique_identifier"] == "xi9k0Xe+16RqyIJ2ApdtvvJgOcY=" OR $invoker_db["client_unique_identifier"] == "2qid9kGm+4JdPy/aLaOAisxLbsw=" OR $invoker_db["client_unique_identifier"] == "2tb9A107zjNvsMgahMGAEhVvglA=" OR $invoker_db["client_unique_identifier"] == "M19tKb6kTJguzYyn6pxkBrcREzc=") { 
+
+  if($invoker_db["client_unique_identifier"] == "UDe92xeUw1ukT46FylXjz6LbpUY=" OR $invoker_db["client_unique_identifier"] == "vvTQr1Rnf8T1vSZDMYLe56yvd8E=" OR $invoker_db["client_unique_identifier"] == "2qid9kGm+4JdPy/aLaOAisxLbsw=" OR $invoker_db["client_unique_identifier"] == "aDtB10Aj7L81TvijvrdCJNtLgzk=" OR $invoker_db["client_unique_identifier"] == "M19tKb6kTJguzYyn6pxkBrcREzc=") { 
 
  // priprava promennych a orezani zprav pro ify
   $uid = substr($msg,0, 4);
@@ -60,6 +63,8 @@ Příkazy $killBota:
 !ping - Test bota
 !botinfo - Zobrazí informace o botovi
 !bothelp - Zobrazí informace o dostupných příkazech
+!botoff - Vypne bota
+!botrestart - Restartuje bota
 !addrooms - Přidá další místnosti v případě nutnosti
 !removerooms - Smaže přidané místnosti pomocí !addrooms
 !uid - Zobrazí unikátní identifikátor uživatele
@@ -75,30 +80,27 @@ Příkazy $killBota:
       global $chann1, $chann2, $chann3;
       try {
       $chann1 = $ts3->channelCreate(array (
-  "channel_name"           => "Místnost 3",
+  "channel_name"           => "Additional public room #1",
   "channel_topic"          => "",
   "channel_codec"          => TeamSpeak3::CODEC_OPUS_VOICE,
+  "channel_codec_quality"  => 6,
   "channel_flag_permanent" => TRUE,
-  "cpid"                   => 2,
+  "channel_order"          => 370,
+  //"channel_icon_id"        => 1031730392,
 ));
       $chann2 = $ts3->channelCreate(array (
-  "channel_name"           => "Místnost 3",
+  "channel_name"           => "Additional public room #2",
   "channel_topic"          => "",
   "channel_codec"          => TeamSpeak3::CODEC_OPUS_VOICE,
+  "channel_codec_quality"  => 6,
   "channel_flag_permanent" => TRUE,
-  "cpid"                   => 3,
-));
-      $chann3 = $ts3->channelCreate(array (
-  "channel_name"           => "Místnost 3",
-  "channel_topic"          => "",
-  "channel_codec"          => TeamSpeak3::CODEC_OPUS_VOICE,
-  "channel_flag_permanent" => TRUE,
-  "cpid"                   => 16,
+  "channel_icon_id"        => 1031730392,
+  //"channel_order"          => $chann1,   TODO: Fix this bullshit not working...
 ));}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
       $ts3->message("Dodatečné místnosti přidány"); }
-      else $ts3->message("Dodatečné místnosti se nepodařilo přidat");
+      else $ts3->message("Dodatečné místnosti se nepodařilo přidat"); echo $error;
       break;
   case "!removerooms":
       $ts3->message("Mažu dodatečné místnosti...");
@@ -106,12 +108,22 @@ Příkazy $killBota:
       echo $chann1;
       try{
       $ts3->channelDelete($chann1);
-      $ts3->channelDelete($chann2);
-      $ts3->channelDelete($chann3);}
+      $ts3->channelDelete($chann2);}
+      //$ts3->channelDelete($chann3);}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
       $ts3->message("Dodatečné místnosti byly smazány"); }
       else $ts3->message("Dodatečné místnosti se nepodařilo smazat");
+      break;
+  case "!botoff":
+      $ts3->message("Shutting down...");
+	  $ts3->request('clientupdate client_nickname=$killBot_shutting_down');
+      die();
+      break;
+  case "!botrestart":
+      $ts3->message("Restartuji se...");
+	  $ts3->request('clientupdate client_nickname=$killBot_shutting_down_'.rand(0, 500));
+      die(exec("php bot.php"));
       break;
       
   }
@@ -198,5 +210,5 @@ Příkazy $killBota:
 }
 }
 }
-if($chyba_spojeni) $chyba_spojeni = false; echo "spojeni preruseno, zkousim znovu   "; goto main;
+if($chyba_spojeni) echo "spojeni preruseno, zkousim znovu   "; goto main;
 ?>
