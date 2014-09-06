@@ -2,38 +2,52 @@
 require_once("libraries/TeamSpeak3/TeamSpeak3.php");
 goto main;
 main:
-// pripojeni na server
+// connecting to the server
 $ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
-$ts3->request('clientupdate client_nickname=$killBot'); //Nastaveni jmena
-if(!$chyba_spojeni) $ts3->message("Verze 1.6.2 nyní běží...");
+$ts3->request('clientupdate client_nickname=$killBot'); // setting the name
+if(!$chyba_spojeni) $ts3->message("Verze 1.6 nyní běží");
 
 $chyba_spojeni = false;
 
-// registrace eventu na ts query
+// registering event listener
 $ts3->notifyRegister("textserver");
 
-// registrace callbacku
+// registering callback function
 TeamSpeak3_Helper_Signal::getInstance()->subscribe("notifyTextmessage", "onTextmessage");
 
-// cekam na event
+// waiting for event
 try {while(1) $ts3->getAdapter()->wait();}
 catch(TeamSpeak3_Transport_Exception $error) {$chyba_spojeni = true;}
 
-// volana callback funkce
+function fetchGroup($user)
+{
+  global $ts3;
+  $id_request = $ts3->request("clientfind pattern=".$user)->toString();
+  $id_result = explode(" ", $id_request);
+  $id = substr($id_result['0'], 5);
+  $group_request = $ts3->request("clientinfo clid=".$id)->toString();
+  $group_result = explode(" ", $group_request);
+  $servergroup = substr($group_result['21'], 20);
+  return $servergroup;  
+}
+
+// called function on event
 function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_Node_Host $host)
 {
   global $ts3;    
   $msg = $event["msg"];
   $invoker = $event["invokername"];
     
-  if($invoker != '$killBot') { // ochrana proti problemum s volanim sam sebe
+  if($invoker != '$killBot') { // to not call itself
     
   $invoker_object = $ts3->clientGetByName($invoker);
-  $invoker_db = $invoker_object->infoDb();	// fungovani pouze pro zvolene lidi
+  $invoker_db = $invoker_object->infoDb();
+      
+  if(fetchGroup($invoker) == "6" OR fetchGroup($invoker) == "7" OR fetchGroup($invoker) == "9") { // here I check if the user has access to bot's commands
+  
+  //if($invoker_db["client_unique_identifier"] == "UDe92xeUw1ukT46FylXjz6LbpUY=" OR $invoker_db["client_unique_identifier"] == "vvTQr1Rnf8T1vSZDMYLe56yvd8E=" OR $invoker_db["client_unique_identifier"] == "2qid9kGm+4JdPy/aLaOAisxLbsw=" OR $invoker_db["client_unique_identifier"] == "aDtB10Aj7L81TvijvrdCJNtLgzk=" OR $invoker_db["client_unique_identifier"] == "M19tKb6kTJguzYyn6pxkBrcREzc=") { 
 
-  if($invoker_db["client_unique_identifier"] == "UDe92xeUw1ukT46FylXjz6LbpUY=" OR $invoker_db["client_unique_identifier"] == "vvTQr1Rnf8T1vSZDMYLe56yvd8E=" OR $invoker_db["client_unique_identifier"] == "2qid9kGm+4JdPy/aLaOAisxLbsw=" OR $invoker_db["client_unique_identifier"] == "aDtB10Aj7L81TvijvrdCJNtLgzk=" OR $invoker_db["client_unique_identifier"] == "M19tKb6kTJguzYyn6pxkBrcREzc=") { 
-
- // priprava promennych a orezani zprav pro ify
+ // preparing the command arguments (yes I know, this could have been done in better way)
   $uid = substr($msg,0, 4);
   $uid_user = substr($msg, 5);
   $stick = substr($msg, 0, 6);
@@ -49,7 +63,7 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
   $unmutechat = substr($msg, 0, 11);
   $unmutechat_user = substr($msg, 12);
     
-    // ve switchi jsou jednoduche prikazy bez jmen a voleb (!ping)
+    // easy commands in the switch here (!ping)
   switch ($msg) {
   case "!ping": 
       $ts3->message("Pong!");
@@ -86,7 +100,7 @@ Příkazy $killBota:
   "channel_codec_quality"  => 6,
   "channel_flag_permanent" => TRUE,
   "channel_order"          => 370,
-  //"channel_icon_id"        => 1031730392,
+  //"channel_icon_id"        => 1513344601,
 ));
       $chann2 = $ts3->channelCreate(array (
   "channel_name"           => "Additional public room #2",
@@ -94,8 +108,8 @@ Příkazy $killBota:
   "channel_codec"          => TeamSpeak3::CODEC_OPUS_VOICE,
   "channel_codec_quality"  => 6,
   "channel_flag_permanent" => TRUE,
-  "channel_icon_id"        => 1031730392,
-  //"channel_order"          => $chann1,   TODO: Fix this bullshit not working...
+  //"channel_icon_id"        => 1031730392, //NOT working ATM, need to fix
+  "channel_order"          => $chann1,
 ));}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
@@ -116,19 +130,19 @@ Příkazy $killBota:
       else $ts3->message("Dodatečné místnosti se nepodařilo smazat");
       break;
   case "!botoff":
-      $ts3->message("Shutting down...");
+      $ts3->message("Fajn, seru na vás!");
 	  $ts3->request('clientupdate client_nickname=$killBot_shutting_down');
       die();
       break;
   case "!botrestart":
-      $ts3->message("Restartuji se...");
+      $ts3->message("No jo furt...");
 	  $ts3->request('clientupdate client_nickname=$killBot_shutting_down_'.rand(0, 500));
       die(exec("php bot.php"));
       break;
       
   }
     
-    //v ifech jsou slozitejsi prikazy s volbami (!stick jmeno)
+    // commands with arguments are in the IFs here (!stick name)
   if($uid == "!uid") {
       if($uid_user != "") {
       $ts3->message("Zjišťuji UID uživatele ".$uid_user."...");
