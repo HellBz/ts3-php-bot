@@ -5,7 +5,7 @@ main:
 // connecting to the server
 $ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
 $ts3->request('clientupdate client_nickname=$killBot'); // setting the name
-if(!$chyba_spojeni) $ts3->message("Verze 1.6 nyní běží");
+if(!$chyba_spojeni) $ts3->message("Verze 1.7 nyní běží");
 
 $chyba_spojeni = false;
 
@@ -48,23 +48,11 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
   //if($invoker_db["client_unique_identifier"] == "UDe92xeUw1ukT46FylXjz6LbpUY=" OR $invoker_db["client_unique_identifier"] == "vvTQr1Rnf8T1vSZDMYLe56yvd8E=" OR $invoker_db["client_unique_identifier"] == "2qid9kGm+4JdPy/aLaOAisxLbsw=" OR $invoker_db["client_unique_identifier"] == "aDtB10Aj7L81TvijvrdCJNtLgzk=" OR $invoker_db["client_unique_identifier"] == "M19tKb6kTJguzYyn6pxkBrcREzc=") { 
 
  // preparing the command arguments (yes I know, this could have been done in better way)
-  $uid = substr($msg,0, 4);
-  $uid_user = substr($msg, 5);
-  $stick = substr($msg, 0, 6);
-  $stick_user = substr($msg, 7);
-  $unstick = substr($msg, 0, 8);
-  $unstick_user = substr($msg, 9);
-  $mute = substr($msg, 0, 5);
-  $mute_user = substr($msg, 6);
-  $unmute = substr($msg, 0, 7);
-  $unmute_user = substr($msg, 8);
-  $mutechat = substr($msg, 0, 9);
-  $mutechat_user = substr($msg, 10);
-  $unmutechat = substr($msg, 0, 11);
-  $unmutechat_user = substr($msg, 12);
+ 
+  $arguments = explode(" ", $msg);
     
-    // easy commands in the switch here (!ping)
-  switch ($msg) {
+    // commands start here
+  switch ($arguments[0]) {
   case "!ping": 
       $ts3->message("Pong!");
       break;
@@ -139,86 +127,83 @@ Příkazy $killBota:
 	  $ts3->request('clientupdate client_nickname=$killBot_shutting_down_'.rand(0, 500));
       die(exec("php bot.php"));
       break;
-      
-  }
-    
-    // commands with arguments are in the IFs here (!stick name)
-  if($uid == "!uid") {
-      if($uid_user != "") {
-      $ts3->message("Zjišťuji UID uživatele ".$uid_user."...");
-      try {$uid_db = $ts3->clientGetByName($uid_user)->InfoDb();}
+  case "!uid":
+      if($arguments[1] != "") {
+      $ts3->message("Zjišťuji UID uživatele ".$arguments[1]."...");
+      try {$uid_db = $ts3->clientGetByName($arguments[1])->InfoDb();}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-      $ts3->message("UID uživatele ".$uid_user." je ".$uid_db["client_unique_identifier"]); }
-      else $ts3->message("Uživatel ".$uid_user." nebyl nalezen");
+      $ts3->message("UID uživatele ".$arguments[1]." je ".$uid_db["client_unique_identifier"]); }
+      else $ts3->message("Uživatel ".$arguments[1]." nebyl nalezen");
       }
       else $ts3->message("Správné použití: !uid <jméno>");
-  }
-   if($stick == "!stick") {
-      if($stick_user != "") {
-      $ts3->message("Přilepuji uživatele ".$stick_user."...");
-      try {$ts3->clientGetByName($stick_user)->permAssign("b_client_is_sticky", TRUE);}
+      break;
+  case "!stick":
+      if($arguments[1] != "") {
+      $ts3->message("Přilepuji uživatele ".$arguments[1]."...");
+      try {$ts3->clientGetByName($arguments[1])->permAssign("b_client_is_sticky", TRUE);}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-      $ts3->message("Uživatel ".$stick_user." byl přilepen"); }
-      else $ts3->message("Uživatel ".$stick_user." nebyl nalezen");
+      $ts3->message("Uživatel ".$arguments[1]." byl přilepen"); }
+      else $ts3->message("Uživatel ".$arguments[1]." nebyl nalezen");
       }
       else $ts3->message("Správné použití: !stick <jméno>");
-  }
-  if($unstick == "!unstick") {
-      if($unstick_user != "") {
-      $ts3->message("Odlepuji uživatele ".$unstick_user."...");
-      try {$ts3->clientGetByName($unstick_user)->permRemove("b_client_is_sticky");}
+      break;
+  case "!unstick":
+      if($arguments[1] != "") {
+      $ts3->message("Odlepuji uživatele ".$arguments[1]."...");
+      try {$ts3->clientGetByName($arguments[1])->permRemove("b_client_is_sticky");}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-          $ts3->message("Uživatel ".$unstick_user." byl odlepen"); }
-      else $ts3->message("Uživatel ".$unstick_user." nebyl nalezen");
+          $ts3->message("Uživatel ".$arguments[1]." byl odlepen"); }
+      else $ts3->message("Uživatel ".$arguments[1]." nebyl nalezen");
       }
       else $ts3->message("Správné použití: !unstick <jméno>");
-  }
-   if($mute == "!mute") {
-      if($mute_user != "") {
-      $ts3->message("Umlčuji uživatele ".$mute_user."...");
-      try {$ts3->clientGetByName($mute_user)->permAssign("i_client_talk_power", -10);}
+      break;
+  case "!mute":
+      if($arguments[1] != "") {
+      $ts3->message("Umlčuji uživatele ".$arguments[1]."...");
+      try {$ts3->clientGetByName($arguments[1])->permAssign("i_client_talk_power", -10);}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-          $ts3->message("Uživatel ".$mute_user." byl umlčen"); }
-      else $ts3->message("Uživatel ".$mute_user." nebyl nalezen");
+          $ts3->message("Uživatel ".$arguments[1]." byl umlčen"); }
+      else $ts3->message("Uživatel ".$arguments[1]." nebyl nalezen");
       }
       else $ts3->message("Správné použití: !mute <jméno>");
-  }
-  if($unmute == "!unmute") {
-      if($unmute_user != "") {
-      $ts3->message("Odmlčuji uživatele ".$unmute_user."...");
-      try {$ts3->clientGetByName($unmute_user)->permRemove("i_client_talk_power");}
+      break;
+  case "!unmute":
+      if($arguments[1] != "") {
+      $ts3->message("Odmlčuji uživatele ".$arguments[1]."...");
+      try {$ts3->clientGetByName($arguments[1])->permRemove("i_client_talk_power");}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-          $ts3->message("Uživatel ".$unmute_user." byl odmlčen"); }
-      else $ts3->message("Uživatel ".$unmute_user." nebyl nalezen");
+          $ts3->message("Uživatel ".$arguments[1]." byl odmlčen"); }
+      else $ts3->message("Uživatel ".$arguments[1]." nebyl nalezen");
       }
       else $ts3->message("Správné použití: !unmute <jméno>");
-  }
-   if($mutechat == "!chatmute") {
-      if($mutechat_user != "") {
-      $ts3->message("Zakazuji chat uživateli ".$mutechat_user."...");
-      try {$ts3->clientGetByName($mutechat_user)->permAssign("b_client_server_textmessage_send", FALSE);$ts3->clientGetByName($mutechat_user)->permAssign("b_client_channel_textmessage_send", FALSE);}
+      break;
+  case "!chatmute":
+      if($arguments[1] != "") {
+      $ts3->message("Zakazuji chat uživateli ".$arguments[1]."...");
+      try {$ts3->clientGetByName($arguments[1])->permAssign("b_client_server_textmessage_send", FALSE);$ts3->clientGetByName($arguments[1])->permAssign("b_client_channel_textmessage_send", FALSE);}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-          $ts3->message("Uživateli ".$mutechat_user." byl zakázán chat"); }
-      else $ts3->message("Uživatel ".$mutechat_user." nebyl nalezen");
+          $ts3->message("Uživateli ".$arguments[1]." byl zakázán chat"); }
+      else $ts3->message("Uživatel ".$arguments[1]." nebyl nalezen");
       }
       else $ts3->message("Správné použití: !chatmute <jméno>");
-  }
-  if($unmutechat == "!chatunmute") {
-      if($unmutechat_user != "") {
-      $ts3->message("Povoluji chat uživateli ".$unmutechat_user."...");
-      try {$ts3->clientGetByName($unmutechat_user)->permRemove("b_client_server_textmessage_send");$ts3->clientGetByName($unmutechat_user)->permRemove("b_client_channel_textmessage_send");}
+      break;
+  case "!chatunmute":
+      if($arguments[1] != "") {
+      $ts3->message("Povoluji chat uživateli ".$arguments[1]."...");
+      try {$ts3->clientGetByName($arguments[1])->permRemove("b_client_server_textmessage_send");$ts3->clientGetByName($arguments[1])->permRemove("b_client_channel_textmessage_send");}
       catch(TeamSpeak3_Exception $error) {$chyba = true;}
       if(!$chyba) {
-          $ts3->message("Uživateli ".$unmutechat_user." byl povolen chat"); }
-      else $ts3->message("Uživatel ".$unmutechat_user." nebyl nalezen");
+          $ts3->message("Uživateli ".$arguments[1]." byl povolen chat"); }
+      else $ts3->message("Uživatel ".$arguments[1]." nebyl nalezen");
       }
       else $ts3->message("Správné použití: !chatunmute <jméno>");
+      
   }
 
 }
