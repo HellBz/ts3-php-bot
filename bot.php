@@ -1,11 +1,22 @@
 <?php
+
+/////////////////////////////////////////////////
+/* ==============[CONFIGURATION]============== */
+$host = "ts.s-cdn.tk";	//IP of the server
+$port = "10011";		//Query port
+$server_port = "9987";	//Virtual server port
+$user = "serveradmin";	//Query login username
+$pass = "***";			//Query login password
+$name = '$killBot';		//Bot's name
+/////////////////////////////////////////////////
+
 require_once("libraries/TeamSpeak3/TeamSpeak3.php");
 goto main;
 main:
 // connecting to the server
-$ts3 = TeamSpeak3::factory("serverquery://serveradmin:***@93.185.105.165:10011/?server_port=9987&blocking=0");
-$ts3->request('clientupdate client_nickname=$killBot'); // setting the name
-if(!$chyba_spojeni) $ts3->message("Verze 1.7 nyní běží");
+$ts3 = TeamSpeak3::factory("serverquery://".$user.":".$pass."@".$host.":".$port."/?server_port=".$server_port."&blocking=0");
+$ts3->request('clientupdate client_nickname='.$name); // setting the name
+if(!$chyba_spojeni) $ts3->message("Verze 1.9 nyní lítá");
 
 $chyba_spojeni = false;
 
@@ -37,17 +48,15 @@ function onTextmessage(TeamSpeak3_Adapter_ServerQuery_Event $event, TeamSpeak3_N
   global $ts3;    
   $msg = $event["msg"];
   $invoker = $event["invokername"];
-    
-  if($invoker != '$killBot') { // to not call itself
-    
-  $invoker_object = $ts3->clientGetByName($invoker);
-  $invoker_db = $invoker_object->infoDb();
+  
+  echo($invoker.": ".$msg."\n");
+  
       
   if(fetchGroup($invoker) == "6" OR fetchGroup($invoker) == "7" OR fetchGroup($invoker) == "9") { // here I check if the user has access to bot's commands
   
   //if($invoker_db["client_unique_identifier"] == "UDe92xeUw1ukT46FylXjz6LbpUY=" OR $invoker_db["client_unique_identifier"] == "vvTQr1Rnf8T1vSZDMYLe56yvd8E=" OR $invoker_db["client_unique_identifier"] == "2qid9kGm+4JdPy/aLaOAisxLbsw=" OR $invoker_db["client_unique_identifier"] == "aDtB10Aj7L81TvijvrdCJNtLgzk=" OR $invoker_db["client_unique_identifier"] == "M19tKb6kTJguzYyn6pxkBrcREzc=") { 
 
- // preparing the command arguments (yes I know, this could have been done in better way)
+ // preparing the command arguments
  
   $arguments = explode(" ", $msg);
     
@@ -118,13 +127,13 @@ Příkazy $killBota:
       else $ts3->message("Dodatečné místnosti se nepodařilo smazat");
       break;
   case "!botoff":
-      $ts3->message("Fajn, seru na vás!");
-	  $ts3->request('clientupdate client_nickname=$killBot_shutting_down');
+      $ts3->message("Vypínám se...");
+	  $ts3->request('clientupdate client_nickname=$killBot_shutting_down_'.rand(-1000, 1000));
       die();
       break;
   case "!botrestart":
-      $ts3->message("No jo furt...");
-	  $ts3->request('clientupdate client_nickname=$killBot_shutting_down_'.rand(0, 500));
+      $ts3->message("Restartuji se...");
+	  $ts3->request('clientupdate client_nickname=$killBot_shutting_down_'.rand(-1000, 1000));
       die(exec("php bot.php"));
       break;
   case "!uid":
@@ -206,7 +215,6 @@ Příkazy $killBota:
       
   }
 
-}
 }
 }
 if($chyba_spojeni) echo "spojeni preruseno, zkousim znovu   "; goto main;
